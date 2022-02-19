@@ -84,13 +84,13 @@ dt_combine <- left_join(standings_final,tm_season, by = c("teamAbbr","season_int
 Okay so we have this nice combined data, pulling a bunch of metrics together with the end of season standings.
 
 
-### Some points about regression
+# Some points about regression
 
 First let us start with linear regression. Linear regression is perhaps the foundational model of all of statistics. It is really well understood, simple, fast, and has tonnes of nice properties which can be exploited. The more that you can understand about linear regression the better, there is pretty much always something more to understand.
 
-#### Basic Structure and Some Math
+## Basic Structure and Some Math
 
-Let $Y = [Y_1,Y_2,\dots,Y_n]$ be an $n \times 1$ vector of outcomes. $n$ is the number of data points that we have, so we have n outcomes. In basketball an example outcome might be something like wins at the end of the year.\\
+Let $Y = [Y_1,Y_2,\dots,Y_n]$ be an $n \times 1$ vector of outcomes. $n$ is the number of data points that we have, so we have n outcomes. In basketball an example outcome might be something like wins at the end of the year.
 
 Let $X$ be an $n\times p$ matrix of covariates. Covariates are things that we want to use to make predictions of inferences about the outcome with. Perhaps we expect the number of wins last season to be related to wins this year or some team stats in recent years or information about the players on the team. All of these could be covariates. What to include depends on the goals of the analysis and the analyst themself.
 
@@ -127,8 +127,8 @@ The cool thing about linear regression is it helps us pick the "best" coefficien
 
 \begin{align*}
 \hat{\beta} &= \arg\min_{\beta \in \mathcal{R}^{p}}\sum_{i=1}^n(Y_i -X_i\beta)^2\\
-&= (X^TX)^{-1}X^TY$
-\end{align*}\\
+&= (X^TX)^{-1}X^TY
+\end{align*}
 
 From a geometric perspective $X\hat{\beta}$ is the best projection of $Y$ onto linear combinations of $X$ (think pythagorus theorem). One way to recall projection is to think about shadows or "dropping perpendiculars". Let's take a look at this in 2 dimensions. Predicting wins next year with wins in the previous season.
 
@@ -166,7 +166,7 @@ Y = \alpha + X\beta + \epsilon\\
 \implies E[Y|X = X] = \alpha + X\beta\\
 \implies E[Y|X = X+1] = \alpha + (X+1)\beta\\
 = \alpha + X\beta + \beta\\
-= E[Y|X = X] + \beta\\
+= E[Y|X = X] + \beta
 \end{align*}
 ```
 
@@ -242,11 +242,11 @@ The blue line (the original slope) and the red line (the slope estimated without
 
 That's great it tells us that the help out season was not shockingly different that the others, it didn't have a lot of what we call leverage changing the estimate by exerting lot's of influence. We could do an exercise like this and check every year if we wanted, it could help us to understand if these relationships are changing significantly over time, which is something we would want to know if we were going to use it to make predictions in the future. 
 
-### Cross Validation
+# Cross Validation
 
 Cross-Validation is a technique that formalizes the idea of checking our predictions on data that we haven't used.
 
-To recap in the previous section, the first goodness of fit test we did was checking the r-squared. We noted, however, that in some sense "re-used" the data we used to make our estimates of $\beta$ and then using that same data to check how well we did. Remember that we chose our beta's to be the once that \textit{minimize} the remaining noise, this is equivalent to choosing the $\beta$'s which \textif{maximize} the amount of variance of the outcome we explain. It is a little disingenuous then to pick the maximizing $\beta$'s for this data set (and for the specific predictors we include in the model) and then evaluate how good of a fit it is with that \textit{same} data.
+To recap in the previous section, the first goodness of fit test we did was checking the r-squared. We noted, however, that in some sense "re-used" the data we used to make our estimates of $\beta$ and then using that same data to check how well we did. Remember that we chose our beta's to be the once that \textit{minimize} the remaining noise, this is equivalent to choosing the $\beta$'s which \textit{maximize} the amount of variance of the outcome we explain. It is a little disingenuous then to pick the maximizing $\beta$'s for this data set (and for the specific predictors we include in the model) and then evaluate how good of a fit it is with that \textit{same} data.
 
 How much of a problem this becomes is related to what our goal is. Especially in the world of prediction, this can be a large problem. The goal of a prediction model is to use it on unseen data to make predictions of the outcome.  If that is our goal then we should probably evaluate it on how well the model predicts outcomes for unseen data. Intuitively hidden data should be more similar to other data we haven't seen or so we hope.
 
@@ -268,7 +268,7 @@ knitr::include_graphics("kfold.png")
 
 The above graph gives you the diagram. We use the remaining 4 groups of data to run the model, then we check how well it fits the test data that we didn't use. We can use any metric we want really, but we should choose the metric carefully depending on the models we are using and the properties we want. In the linear regression case we might use something like $R^2$ or estimated squared error. We repeat this process for all 5 groups, setting one group aside, using the other 4 to estimate and we average our test metric across the 5 groups. We might use this to choose our predictors. For example in each iteration of the erection we might take a couple competing models (different regression types or just different variables) and compare how they do on the unseen data. We might take the best model as the one we actually use. There are of course many other things we can do but that is a reasonable option.
 
-#### Cross-Validation Code
+## Cross-Validation Code
 
 Here I am re-using some simulation code to demonstrate CV. A useful exerise to the reader would be to try and recreate this for the wins data set we were playing with earlier.
 
@@ -316,7 +316,7 @@ One validation metric will be Root Mean Squared Error[RMSE], the other will be $
 RMSE = \frac{1}{K}\sum_{k=1}^{K}\sqrt{\frac{1}{n_k}\sum_{i=1}^{n_k}(y_{test_i} - X_{test_i}\hat{\beta_{train}})^2}
 \end{align*}
 
-We take the $n_k$ test outcomes that we put aside $y_{test}$ and we compute our predictions using the $\hat{beta_{train}}$ that we estimate using the training data (the other 4 groups of data not in the test set) and the predictors from the test data set $X_{test}$. The prediction we can call $\hat{Y_{test}} = X_{test_i}\hat{\beta_{train}}$. Now we look how far away the square of our predictions $\hat{Y_{test}}$ are from the actual values $Y_{test}$ are on average.
+We take the $n_k$ test outcomes that we put aside $y_{test}$ and we compute our predictions using the $\hat{\beta_{train}}$ that we estimate using the training data (the other 4 groups of data not in the test set) and the predictors from the test data set $X_{test}$. The prediction we can call $\hat{Y_{test}} = X_{test_i}\hat{\beta_{train}}$. Now we look how far away the square of our predictions $\hat{Y_{test}}$ are from the actual values $Y_{test}$ are on average.
 
 
 ```{r,warning=FALSE}
@@ -393,7 +393,7 @@ mean(Rsqr2)
 We can see very clearly that the first model is much better by both metrics. Higher $R^2$ is better, lower RMSE is better. So we would reasonably include the 5th variable, it seems to greatly improve our predictions.
 
 
-## What about regression that's not linear (in that way anyway)
+# What about regression that's not linear (in that way anyway)
 
 There are many other ways to do regression. Here we are going to briefly talk about regression with binary outcomes (0 or 1). Wins-losses are well represented like this. If you remember from probability, conditional expectation of binary variables are also conditional probabilities, so we will model say $P(Y=1|X)$. Here we are going to try to predict the outcome of an individual game.
 
@@ -470,7 +470,7 @@ Above is the calibration plot. Ideally we want the fitted black line as close to
 A good exercise for the reader would be to play with the win model. How can we make it better? Are there important covariates we are missing? How optimal is a 20 game rolling average compared to other choices?
 
 
-## A tiny bit more about loss functions and conditional mean
+# A tiny bit more about loss functions and conditional mean
 
 In statistics, we often find ourself in a situation where we need to make a prediction. When you want to make a prediction you need some way of determining how good that prediction is. What counts as a close prediction? What counts as a poor prediction? It is often really useful to write down a function which does this for us, that is we define a distance to penalize how wrong our predictions are. This is sometimes called a loss function.
 
